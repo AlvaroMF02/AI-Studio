@@ -19,7 +19,7 @@
         <parameter key="type" value="include attributes"/>
         <parameter key="attribute_filter_type" value="a subset"/>
         <parameter key="select_attribute" value=""/>
-        <parameter key="select_subset" value="Stress_Level␞Humidity"/>
+        <parameter key="select_subset" value="Stress_Level␞Temperature"/>
         <parameter key="also_apply_to_special_attributes_(id,_label..)" value="false"/>
       </operator>
       <operator activated="true" class="blending:set_role" compatibility="11.0.001" expanded="true" height="82" name="Set Role" width="90" x="313" y="34">
@@ -93,6 +93,7 @@
       <connect from_op="Retrieve Stress-Lysis" from_port="output" to_op="Select Attributes" to_port="example set input"/>
       <connect from_op="Select Attributes" from_port="example set output" to_op="Set Role" to_port="example set input"/>
       <connect from_op="Set Role" from_port="example set output" to_op="Split Data" to_port="example set"/>
+      <connect from_op="Set Role" from_port="original" to_port="result 2"/>
       <connect from_op="Split Data" from_port="partition 1" to_op="Linear Regression" to_port="training set"/>
       <connect from_op="Split Data" from_port="partition 2" to_op="Apply Model Test" to_port="unlabelled data"/>
       <connect from_op="Linear Regression" from_port="model" to_op="Multiply" to_port="input"/>
@@ -105,6 +106,7 @@
       <portSpacing port="source_input 1" spacing="0"/>
       <portSpacing port="sink_result 1" spacing="0"/>
       <portSpacing port="sink_result 2" spacing="0"/>
+      <portSpacing port="sink_result 3" spacing="0"/>
     </process>
   </operator>
 </process>
