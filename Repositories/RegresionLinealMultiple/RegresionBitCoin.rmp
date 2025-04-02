@@ -19,33 +19,13 @@
         <parameter key="type" value="include attributes"/>
         <parameter key="attribute_filter_type" value="a subset"/>
         <parameter key="select_attribute" value=""/>
-        <parameter key="select_subset" value="change %␞date␞high␞low␞open␞price␞vol."/>
+        <parameter key="select_subset" value="date␞high␞low␞open␞price"/>
         <parameter key="also_apply_to_special_attributes_(id,_label..)" value="false"/>
       </operator>
       <operator activated="true" class="blending:set_role" compatibility="11.0.001" expanded="true" height="82" name="Set Role" width="90" x="380" y="34">
         <list key="set_roles">
           <parameter key="price" value="label"/>
         </list>
-      </operator>
-      <operator activated="true" class="blending:rename" compatibility="11.0.001" expanded="true" height="82" name="Rename" width="90" x="112" y="187">
-        <list key="rename attributes">
-          <parameter key="price" value="Precio"/>
-          <parameter key="change %" value="Cambio"/>
-          <parameter key="high" value="PrecAlto"/>
-          <parameter key="low" value="PrecBajo"/>
-          <parameter key="date" value="Fecha"/>
-          <parameter key="open" value="PrecioInicial"/>
-          <parameter key="vol." value="Volumen"/>
-        </list>
-        <parameter key="from_attribute" value=""/>
-        <parameter key="to_attribute" value=""/>
-      </operator>
-      <operator activated="true" class="blending:select_attributes" compatibility="11.0.001" expanded="true" height="82" name="Select Attributes (2)" width="90" x="246" y="187">
-        <parameter key="type" value="include attributes"/>
-        <parameter key="attribute_filter_type" value="a subset"/>
-        <parameter key="select_attribute" value=""/>
-        <parameter key="select_subset" value="Precio␞PrecioInicial"/>
-        <parameter key="also_apply_to_special_attributes_(id,_label..)" value="false"/>
       </operator>
       <operator activated="true" class="blending:split_data" compatibility="11.0.001" expanded="true" height="103" name="Split Data" width="90" x="380" y="187">
         <enumeration key="partitions">
@@ -110,24 +90,41 @@
         <parameter key="skip_undefined_labels" value="true"/>
         <parameter key="use_example_weights" value="true"/>
       </operator>
+      <operator activated="true" class="retrieve" compatibility="11.0.001" expanded="true" height="68" name="Retrieve btcNewsToPrice2 (2)" width="90" x="112" y="340">
+        <parameter key="repository_entry" value="//CursoDigitechModelosML/data/btcNewsToPrice2"/>
+      </operator>
+      <operator activated="true" class="blending:generate_columns" compatibility="11.0.001" expanded="true" height="82" name="Generate Attributes" width="90" x="246" y="340">
+        <list key="function_descriptions">
+          <parameter key="ns" value="if(contains([vol.],&quot;K&quot;),parse([vol.])*1000,if(contains(parse([vol.]),&quot;M&quot;),[vol.]*1000000,0))"/>
+        </list>
+        <parameter key="keep_all_columns" value="true"/>
+        <parameter key="default_time_zone" value="Europe/Madrid"/>
+      </operator>
+      <operator activated="true" class="blending:select_attributes" compatibility="11.0.001" expanded="true" height="82" name="Select Attributes (2)" width="90" x="380" y="340">
+        <parameter key="type" value="include attributes"/>
+        <parameter key="attribute_filter_type" value="a subset"/>
+        <parameter key="select_attribute" value=""/>
+        <parameter key="select_subset" value="date␞low␞price␞vol."/>
+        <parameter key="also_apply_to_special_attributes_(id,_label..)" value="false"/>
+      </operator>
       <connect from_op="Retrieve btcNewsToPrice2" from_port="output" to_op="Select Attributes" to_port="example set input"/>
       <connect from_op="Select Attributes" from_port="example set output" to_op="Set Role" to_port="example set input"/>
-      <connect from_op="Set Role" from_port="example set output" to_op="Rename" to_port="example set input"/>
-      <connect from_op="Rename" from_port="example set output" to_op="Select Attributes (2)" to_port="example set input"/>
-      <connect from_op="Select Attributes (2)" from_port="example set output" to_op="Split Data" to_port="example set"/>
+      <connect from_op="Set Role" from_port="example set output" to_op="Split Data" to_port="example set"/>
       <connect from_op="Split Data" from_port="partition 1" to_op="Linear Regression" to_port="training set"/>
       <connect from_op="Split Data" from_port="partition 2" to_op="Apply Model TEST" to_port="unlabelled data"/>
       <connect from_op="Linear Regression" from_port="model" to_op="Multiply" to_port="input"/>
       <connect from_op="Linear Regression" from_port="exampleSet" to_op="Apply Model TR" to_port="unlabelled data"/>
+      <connect from_op="Linear Regression" from_port="weights" to_port="result 4"/>
       <connect from_op="Multiply" from_port="output 1" to_op="Apply Model TR" to_port="model"/>
       <connect from_op="Multiply" from_port="output 2" to_op="Apply Model TEST" to_port="model"/>
       <connect from_op="Apply Model TR" from_port="labelled data" to_op="Performance TR" to_port="labelled data"/>
-      <connect from_op="Performance TR" from_port="performance" to_port="result 1"/>
-      <connect from_op="Performance TR" from_port="example set" to_port="result 2"/>
+      <connect from_op="Performance TR" from_port="example set" to_port="result 1"/>
       <connect from_op="Apply Model TEST" from_port="labelled data" to_op="Performance TEST" to_port="labelled data"/>
-      <connect from_op="Apply Model TEST" from_port="model" to_port="result 5"/>
-      <connect from_op="Performance TEST" from_port="performance" to_port="result 3"/>
-      <connect from_op="Performance TEST" from_port="example set" to_port="result 4"/>
+      <connect from_op="Apply Model TEST" from_port="model" to_port="result 3"/>
+      <connect from_op="Performance TEST" from_port="example set" to_port="result 2"/>
+      <connect from_op="Retrieve btcNewsToPrice2 (2)" from_port="output" to_op="Generate Attributes" to_port="table input"/>
+      <connect from_op="Generate Attributes" from_port="table output" to_op="Select Attributes (2)" to_port="example set input"/>
+      <connect from_op="Select Attributes (2)" from_port="example set output" to_port="result 5"/>
       <portSpacing port="source_input 1" spacing="0"/>
       <portSpacing port="sink_result 1" spacing="0"/>
       <portSpacing port="sink_result 2" spacing="0"/>
