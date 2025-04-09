@@ -15,8 +15,15 @@
       <operator activated="true" class="retrieve" compatibility="11.0.001" expanded="true" height="68" name="Retrieve customer-churn-data" width="90" x="45" y="34">
         <parameter key="repository_entry" value="//ArbolDecisiones/data/customer-churn-data"/>
       </operator>
-      <operator activated="true" class="multiply" compatibility="11.0.001" expanded="true" height="103" name="Multiply" width="90" x="179" y="34"/>
-      <operator activated="true" class="filter_examples" compatibility="11.0.001" expanded="true" height="103" name="Filter Examples" width="90" x="313" y="34">
+      <operator activated="true" class="blending:rename" compatibility="11.0.001" expanded="true" height="82" name="Rename" width="90" x="179" y="34">
+        <list key="rename attributes">
+          <parameter key="Gender" value="Genero"/>
+        </list>
+        <parameter key="from_attribute" value=""/>
+        <parameter key="to_attribute" value=""/>
+      </operator>
+      <operator activated="true" class="multiply" compatibility="11.0.001" expanded="true" height="103" name="Multiply" width="90" x="313" y="34"/>
+      <operator activated="true" class="filter_examples" compatibility="11.0.001" expanded="true" height="103" name="Churn is not missing" width="90" x="447" y="34">
         <parameter key="parameter_expression" value=""/>
         <parameter key="condition_class" value="custom_filters"/>
         <parameter key="invert_filter" value="false"/>
@@ -25,13 +32,6 @@
         </list>
         <parameter key="filters_logic_and" value="true"/>
         <parameter key="filters_check_metadata" value="true"/>
-      </operator>
-      <operator activated="true" class="blending:rename" compatibility="11.0.001" expanded="true" height="82" name="Rename" width="90" x="447" y="34">
-        <list key="rename attributes">
-          <parameter key="Gender" value="Genero"/>
-        </list>
-        <parameter key="from_attribute" value=""/>
-        <parameter key="to_attribute" value=""/>
       </operator>
       <operator activated="true" class="blending:set_role" compatibility="11.0.001" expanded="true" height="82" name="Set Role" width="90" x="581" y="34">
         <list key="set_roles">
@@ -49,7 +49,7 @@
         <parameter key="minimal_size_for_split" value="4"/>
         <parameter key="number_of_prepruning_alternatives" value="3"/>
       </operator>
-      <operator activated="true" class="filter_examples" compatibility="11.0.001" expanded="true" height="103" name="Filter Examples (2)" width="90" x="313" y="187">
+      <operator activated="true" class="filter_examples" compatibility="11.0.001" expanded="true" height="103" name="Churn faltantes" width="90" x="447" y="187">
         <parameter key="parameter_expression" value=""/>
         <parameter key="condition_class" value="custom_filters"/>
         <parameter key="invert_filter" value="false"/>
@@ -63,29 +63,21 @@
       <operator activated="true" class="apply_model" compatibility="11.0.001" expanded="true" height="82" name="Original" width="90" x="983" y="34">
         <list key="application_parameters"/>
       </operator>
-      <operator activated="true" class="blending:rename" compatibility="11.0.001" expanded="true" height="82" name="Rename (2)" width="90" x="447" y="187">
-        <list key="rename attributes">
-          <parameter key="Gender" value="Genero"/>
-        </list>
-        <parameter key="from_attribute" value=""/>
-        <parameter key="to_attribute" value=""/>
-      </operator>
       <operator activated="true" class="apply_model" compatibility="11.0.001" expanded="true" height="82" name="Modelo 2" width="90" x="983" y="238">
         <list key="application_parameters"/>
       </operator>
-      <connect from_op="Retrieve customer-churn-data" from_port="output" to_op="Multiply" to_port="input"/>
-      <connect from_op="Multiply" from_port="output 1" to_op="Filter Examples" to_port="example set input"/>
-      <connect from_op="Multiply" from_port="output 2" to_op="Filter Examples (2)" to_port="example set input"/>
-      <connect from_op="Filter Examples" from_port="example set output" to_op="Rename" to_port="example set input"/>
-      <connect from_op="Rename" from_port="example set output" to_op="Set Role" to_port="example set input"/>
+      <connect from_op="Retrieve customer-churn-data" from_port="output" to_op="Rename" to_port="example set input"/>
+      <connect from_op="Rename" from_port="example set output" to_op="Multiply" to_port="input"/>
+      <connect from_op="Multiply" from_port="output 1" to_op="Churn is not missing" to_port="example set input"/>
+      <connect from_op="Multiply" from_port="output 2" to_op="Churn faltantes" to_port="example set input"/>
+      <connect from_op="Churn is not missing" from_port="example set output" to_op="Set Role" to_port="example set input"/>
       <connect from_op="Set Role" from_port="example set output" to_op="Decision Tree" to_port="training set"/>
       <connect from_op="Decision Tree" from_port="model" to_op="Multiply (2)" to_port="input"/>
       <connect from_op="Decision Tree" from_port="exampleSet" to_op="Original" to_port="unlabelled data"/>
-      <connect from_op="Filter Examples (2)" from_port="example set output" to_op="Rename (2)" to_port="example set input"/>
+      <connect from_op="Churn faltantes" from_port="example set output" to_op="Modelo 2" to_port="unlabelled data"/>
       <connect from_op="Multiply (2)" from_port="output 1" to_op="Modelo 2" to_port="model"/>
       <connect from_op="Multiply (2)" from_port="output 2" to_op="Original" to_port="model"/>
       <connect from_op="Original" from_port="labelled data" to_port="result 1"/>
-      <connect from_op="Rename (2)" from_port="example set output" to_op="Modelo 2" to_port="unlabelled data"/>
       <connect from_op="Modelo 2" from_port="labelled data" to_port="result 2"/>
       <portSpacing port="source_input 1" spacing="0"/>
       <portSpacing port="sink_result 1" spacing="0"/>
